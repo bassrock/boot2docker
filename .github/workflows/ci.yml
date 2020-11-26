@@ -41,8 +41,7 @@ jobs:
           docker build -t boot2docker/boot2docker .
           docker run --rm boot2docker/boot2docker > boot2docker.iso
 
-      - name: '"ls"'
-        run: ls -lh boot2docker.iso
-
-      - name: '"docker images"'
-        run: docker images
+      - uses: actions/upload-artifact@v2
+        with:
+          name: boot2docker.iso
+          path: boot2docker.iso
