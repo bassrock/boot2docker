@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:stable-slim
 
 SHELL ["/bin/bash", "-Eeuo", "pipefail", "-xc"]
 
@@ -25,6 +25,7 @@ RUN apt-get update; \
 		wget \
 		xorriso \
 		xz-utils \
+		rsync \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
@@ -178,7 +179,7 @@ ENV LINUX_GPG_KEYS \
 		647F28654894E3BD457199BE38DBBDC86092693E
 
 # updated via "update.sh"
-ENV LINUX_VERSION 4.19.160
+ENV LINUX_VERSION 5.4.80
 
 RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.xz"; \
 	wget -O /linux.tar.asc "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.sign"; \
@@ -364,14 +365,14 @@ RUN tcl-tce-load open-vm-tools; \
 	# vmtoolsd needs to run within a vmware hypervisor so we don't print the version
 	#tcl-chroot vmtoolsd --version
 
-ENV PARALLELS_VERSION 13.3.0-43321
+ENV PARALLELS_VERSION 16.1.1-49141
 
 RUN wget -O /parallels.tgz "https://download.parallels.com/desktop/v${PARALLELS_VERSION%%.*}/$PARALLELS_VERSION/ParallelsTools-$PARALLELS_VERSION-boot2docker.tar.gz"; \
 	mkdir /usr/src/parallels; \
 	tar --extract --file /parallels.tgz --directory /usr/src/parallels --strip-components 1; \
 	rm /parallels.tgz
 RUN cp -vr /usr/src/parallels/tools/* ./; \
-	make -C /usr/src/parallels/kmods -f Makefile.kmods -j "$(nproc)" installme \
+	make -C /usr/src/parallels/kmods -f Makefile.kmods -j "$(nproc)" compile \
 		SRC='/usr/src/linux' \
 		KERNEL_DIR='/usr/src/linux' \
 		KVER="$(< /usr/src/linux/include/config/kernel.release)" \

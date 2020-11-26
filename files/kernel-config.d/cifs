@@ -1,5 +1,7 @@
 CONFIG_CIFS=m
-CONFIG_CIFS_ACL=y
+# Remove unneeded ifdef for CONFIG_CIFS_ACL (always enabled now)
+# https://wiki.samba.org/index.php/LinuxCIFSKernel
+#CONFIG_CIFS_ACL=y
 CONFIG_CIFS_FSCACHE=y
 CONFIG_CIFS_XATTR=y
 
