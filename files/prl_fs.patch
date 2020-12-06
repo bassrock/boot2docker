@@ -1,0 +1,34 @@
+Description: DHCP adjustments; only empty "resolv.conf" when we get DNS from DHCP, run DHCP synchronously, use NTP servers from DHCP
+Author: "aheissenberger", Tianon Gravi
+Origin: http://forum.tinycorelinux.net/index.php/topic,16482.msg98078.html#msg98078 (partial)
+
+diff --git a/usr/src/parallels/kmods/prl_fs/SharedFolders/Guest/Linux/prl_fs/inode.c b/usr/src/parallels/kmods/prl_fs/SharedFolders/Guest/Linux/prl_fs/inode.c
+index f4ef2a4..c7b59fd 100755
+--- a/usr/src/parallels/kmods/prl_fs/SharedFolders/Guest/Linux/prl_fs/inode.c	2020-07-31 03:05:59.000000000 +1000
++++ b/usr/src/parallels/kmods/prl_fs/SharedFolders/Guest/Linux/prl_fs/inode.c	2020-10-18 07:05:09.716999971 +1100
+@@ -55,7 +55,11 @@ void init_buffer_descriptor(struct buffe
+ 	bd->buf = buf;
+ 	bd->len = len;
+ 	bd->write = (write == 0) ? 0 : 1;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)
++	bd->user = (user == 0) ? 0 : uaccess_kernel() ? 0 : 1;
++#else
+ 	bd->user = (user == 0) ? 0 : segment_eq(get_fs(), USER_DS) ? 1 : 0;
++#endif
+ 	bd->flags = TG_REQ_COMMON;
+ }
+ 
+diff --git a/usr/src/parallels/kmods/prl_fs_freeze/Snapshot/Guest/Linux/prl_freeze/prl_fs_freeze.c b/usr/src/parallels/kmods/prl_fs_freeze/Snapshot/Guest/Linux/prl_freeze/prl_fs_freeze.c
+index f4ef2a4..c7b59fd 100755
+--- a/usr/src/parallels/kmods/prl_fs_freeze/Snapshot/Guest/Linux/prl_freeze/prl_fs_freeze.c	2020-07-31 03:06:00.000000000 +1000
++++ b/usr/src/parallels/kmods/prl_fs_freeze/Snapshot/Guest/Linux/prl_freeze/prl_fs_freeze.c	2020-10-18 07:13:21.300333278 +1100
+@@ -20,6 +20,9 @@
+ #include <linux/workqueue.h>
+ #include <linux/namei.h>
+ #include <linux/slab.h>
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)
++#include <linux/blkdev.h>
++#endif
+ #include <asm/uaccess.h>
+ #include "prlfs_freeze_compat.h"
+ 

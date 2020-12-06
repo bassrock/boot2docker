@@ -253,8 +253,8 @@ RUN setConfs="$(grep -vEh '^[#-]' /kernel-config.d/* | sort -u)"; \
 	\
 	make -C /usr/src/linux \
 	defconfig \
-	kvmconfig \
-	xenconfig \
+	kvm_guest.config \
+	xen.config \
 	> /dev/null; \
 	\
 	( \
@@ -371,6 +371,20 @@ RUN wget -O /parallels.tgz "https://download.parallels.com/desktop/v${PARALLELS_
 	mkdir /usr/src/parallels; \
 	tar --extract --file /parallels.tgz --directory /usr/src/parallels --strip-components 1; \
 	rm /parallels.tgz
+
+COPY files/prl_fs.patch /parallels-patches/
+
+RUN cwd=$(pwd);\
+	cd /usr/src/parallels; \
+	for patch in /parallels-patches/*.patch; do \
+	patch \
+	--input "$patch" \
+	--strip 4 \
+	--verbose \
+	; \
+	done; \
+	cd $cwd;
+
 RUN cp -vr /usr/src/parallels/tools/* ./; \
 	make -C /usr/src/parallels/kmods -f Makefile.kmods -j "$(nproc)" compile \
 	SRC='/usr/src/linux' \
@@ -417,7 +431,7 @@ RUN wget -O usr/local/sbin/cgroupfs-mount "https://github.com/tianon/cgroupfs-mo
 ENV DOCKER_VERSION 19.03.14
 
 # Get the Docker binaries with version that matches our boot2docker version.
-RUN DOCKER_CHANNEL='edge'; \
+RUN DOCKER_CHANNEL='stable'; \
 	case "$DOCKER_VERSION" in \
 	# all the pre-releases go in the "test" channel
 	*-rc* | *-beta* | *-tp* ) DOCKER_CHANNEL='test' ;; \
