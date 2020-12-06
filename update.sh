@@ -12,7 +12,7 @@ mirrors=(
 )
 
 # https://www.kernel.org/
-kernelBase='5.4'
+kernelBase='5.9'
 # https://github.com/boot2docker/boot2docker/issues/1398
 # https://download.virtualbox.org/virtualbox/
 vboxBase='6'
@@ -23,7 +23,7 @@ export GIT_HTTP_LOW_SPEED_TIME='2'
 # ... or servers being down
 wget() { command wget --timeout=2 "$@" -o /dev/null; }
 
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+cd "$(dirname "$(greadlink -f "$BASH_SOURCE")")"
 
 seds=(
 	-e 's!^(ENV TCL_MIRRORS).*!\1 '"${mirrors[*]}"'!'
@@ -101,4 +101,4 @@ seds+=(
 )
 
 set -x
-sed -ri "${seds[@]}" Dockerfile
+gsed -ri "${seds[@]}" Dockerfile
