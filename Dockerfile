@@ -179,7 +179,7 @@ ENV LINUX_GPG_KEYS \
 	647F28654894E3BD457199BE38DBBDC86092693E
 
 # updated via "update.sh"
-ENV LINUX_VERSION 5.9.12
+ENV LINUX_VERSION 5.9.14
 
 RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.xz"; \
 	wget -O /linux.tar.asc "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.sign"; \
@@ -397,7 +397,7 @@ RUN cp -vr /usr/src/parallels/tools/* ./; \
 
 # https://github.com/xenserver/xe-guest-utilities/tags
 # updated via "update.sh"
-ENV XEN_VERSION 7.20.0
+ENV XEN_VERSION 7.21.0
 
 RUN wget -O /xen.tgz "https://github.com/xenserver/xe-guest-utilities/archive/v$XEN_VERSION.tar.gz"; \
 	mkdir /usr/src/xen; \
@@ -428,7 +428,7 @@ RUN wget -O usr/local/sbin/cgroupfs-mount "https://github.com/tianon/cgroupfs-mo
 	chmod +x usr/local/sbin/cgroupfs-mount; \
 	tcl-chroot cgroupfs-mount
 
-ENV DOCKER_VERSION 19.03.14
+ENV DOCKER_VERSION 20.10.0
 
 # Get the Docker binaries with version that matches our boot2docker version.
 RUN DOCKER_CHANNEL='stable'; \
@@ -442,7 +442,7 @@ RUN DOCKER_CHANNEL='stable'; \
 	rm /docker.tgz; \
 	\
 	# download bash-completion too
-	wget -O usr/local/share/bash-completion/completions/docker "https://github.com/docker/docker-ce/raw/v${DOCKER_VERSION}/components/cli/contrib/completion/bash/docker"; \
+	wget -O usr/local/share/bash-completion/completions/docker "https://github.com/docker/cli/tree/v$DOCKER_VERSION/contrib/completion/bash/docker"; \
 	\
 	for binary in \
 	containerd \
