@@ -179,7 +179,7 @@ ENV LINUX_GPG_KEYS \
 	647F28654894E3BD457199BE38DBBDC86092693E
 
 # updated via "update.sh"
-ENV LINUX_VERSION 5.9.14
+ENV LINUX_VERSION 5.9.16
 
 RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.xz"; \
 	wget -O /linux.tar.asc "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.sign"; \
@@ -428,7 +428,7 @@ RUN wget -O usr/local/sbin/cgroupfs-mount "https://github.com/tianon/cgroupfs-mo
 	chmod +x usr/local/sbin/cgroupfs-mount; \
 	tcl-chroot cgroupfs-mount
 
-ENV DOCKER_VERSION 20.10.0
+ENV DOCKER_VERSION 20.10.1
 
 # Get the Docker binaries with version that matches our boot2docker version.
 RUN DOCKER_CHANNEL='stable'; \
