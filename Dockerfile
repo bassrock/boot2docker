@@ -41,7 +41,7 @@ ENV TCL_MIRRORS http://distro.ibiblio.org/tinycorelinux http://repo.tinycorelinu
 ENV TCL_MAJOR 11.x
 ENV TCL_VERSION 11.1
 
-# http://distro.ibiblio.org/tinycorelinux/8.x/x86_64/archive/8.2.1/distribution_files/rootfs64.gz.md5.txt
+# http://distro.ibiblio.org/tinycorelinux/11.x/x86_64/release/distribution_files/rootfs64.gz.md5.txt
 # updated via "update.sh"
 ENV TCL_ROOTFS="rootfs64.gz" TCL_ROOTFS_MD5="3c5846fd0eb2f4ecc15e424678ef7919"
 
@@ -110,7 +110,7 @@ RUN tcl-chroot adduser \
 	echo 'docker ALL = NOPASSWD: ALL' >> etc/sudoers; \
 	sed -i 's/USER="tc"/USER="docker"/g' etc/init.d/tc-* etc/init.d/services/*
 
-# https://github.com/tatsushid/docker-tinycore/blob/017b258a08a41399f65250c9865a163226c8e0bf/8.2/x86_64/Dockerfile
+# https://github.com/tatsushid/docker-tinycore/blob/cbffbadd85cd3372fb1a8a0da9d9a817ceb6a159/11.0/x86_64/Dockerfile
 RUN mkdir -p proc; \
 	touch proc/cmdline; \
 	mkdir -p tmp/tce/optional usr/local/tce.installed/optional; \
@@ -118,11 +118,11 @@ RUN mkdir -p proc; \
 	chmod -R g+w tmp/tce; \
 	ln -sT ../../tmp/tce etc/sysconfig/tcedir; \
 	echo -n docker > etc/sysconfig/tcuser; \
-	tcl-chroot sh -c '. /etc/init.d/tc-functions && setupHome'
+	tcl-chroot sh -c '. /etc/init.d/tc-functions && ldconfig && setupHome'
 
 # as of squashfs-tools 4.4, TCL's unsquashfs is broken... (fails to unsquashfs *many* core tcz files)
 # https://github.com/plougher/squashfs-tools/releases
-ENV SQUASHFS_VERSION 4.4
+ENV SQUASHFS_VERSION 4.4-git.1
 RUN wget -O squashfs.tgz "https://github.com/plougher/squashfs-tools/archive/$SQUASHFS_VERSION.tar.gz"; \
 	tar --directory=/usr/src --extract --file=squashfs.tgz; \
 	make -C "/usr/src/squashfs-tools-$SQUASHFS_VERSION/squashfs-tools" \
@@ -319,7 +319,9 @@ RUN tcl-tce-load \
 	rsync \
 	tar \
 	util-linux \
-	xz
+	xz \
+	# Weird docker compose issues https://github.com/docker/compose/issues/6678#issuecomment-499319237
+	haveged
 
 # bash-completion puts auto-load in /usr/local/etc/profile.d instead of /etc/profile.d
 # (this one-liner is the same as the loop at the end of /etc/profile with an adjusted search path)
@@ -406,7 +408,7 @@ RUN wget -O /xen.tgz "https://github.com/xenserver/xe-guest-utilities/archive/v$
 # download "golang.org/x/sys/unix" dependency (new in 7.14.0)
 RUN cd /usr/src/xen; \
 	mkdir -p GOPATH/src/golang.org/x/sys; \
-	wget -O sys.tgz 'https://github.com/golang/sys/archive/fc99dfbffb4e5ed5758a37e31dd861afe285406b.tar.gz'; \
+	wget -O sys.tgz 'https://github.com/golang/sys/archive/0d417f6369309be088e227ead8736fb722d759d3.tar.gz'; \
 	tar -xf sys.tgz -C GOPATH/src/golang.org/x/sys --strip-components 1; \
 	rm sys.tgz
 RUN GOPATH='/usr/src/xen/GOPATH' make -C /usr/src/xen -j "$(nproc)" PRODUCT_VERSION="$XEN_VERSION" RELEASE='boot2docker'; \

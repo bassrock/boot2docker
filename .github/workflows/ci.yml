@@ -5,13 +5,15 @@ on:
   pull_request:
 
   push:
+    tags:
+      - '*'
 
   schedule:
     - cron: 0 0 * * 0
 
 jobs:
 
-  build-test:
+  build:
 
     runs-on: ubuntu-latest
 
@@ -46,8 +48,14 @@ jobs:
           name: boot2docker.iso
           path: boot2docker.iso
 
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
       - uses: ncipollo/release-action@v1
         with:
-          name: latest
+          allowUpdates: true
           artifacts: "boot2docker.iso"
           token: ${{ secrets.GITHUB_TOKEN }}
