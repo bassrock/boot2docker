@@ -75,6 +75,14 @@ if [ -e /var/lib/boot2docker/bootsync.sh ]; then
 	sh /var/lib/boot2docker/bootsync.sh
 fi
 
+##Enable NFS Debugging
+#rpcdebug -m nfs -s all
+#rpcdebug -m nfsd -s all
+#
+##Start syslog and klog
+#syslogd &
+#klogd &
+
 # "env -i" thanks to https://github.com/moby/moby/issues/39009 ...
 env -i PATH="$PATH" /etc/init.d/docker start
 
